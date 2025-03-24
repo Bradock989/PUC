@@ -1,10 +1,10 @@
 name: CI/CD Pipeline
- 
+
 on:
   push:
     branches:
       - main
- 
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -13,10 +13,31 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Verificar arquivos no repositório
-        run: ls -R  # Debug para garantir que os arquivos foram baixados
+        run: ls -R  # Debug para garantir que os arquivos foram baixados corretamente
+
+      - name: Verificar se pyproject.toml existe
+        run: |
+          if [ -f "pyproject.toml" ]; then
+            echo "✅ pyproject.toml encontrado!"
+          else
+            echo "❌ ERRO: pyproject.toml não encontrado!"
+            exit 1
+          fi
 
       - name: Instalar o Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Definir versão do Python no Poetry
+        run: poetry env use python3
+
+      - name: Instalar dependências com Poetry
+        run: poetry install --no-root --directory .
+
+      - name: Verificar PEP8
+        run: poetry run flake8 jogo.py
+
+      - name: Verificar Lint
+        run: poetry run pylint jogo.py
 
