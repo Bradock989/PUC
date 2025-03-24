@@ -15,7 +15,7 @@ jobs:
       - name: Configurar a versão do Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'  # Versão estável recomendada
+          python-version: '3.11'  # Versão estável recomendada
 
       - name: Instalar o Poetry
         run: |
