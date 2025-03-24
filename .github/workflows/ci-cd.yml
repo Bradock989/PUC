@@ -32,6 +32,9 @@ jobs:
       - name: Definir versão do Python no Poetry
         run: poetry env use python3
 
+      - name: Atualizar poetry.lock
+        run: poetry lock --no-interaction  # Corrige a inconsistência no lock file
+
       - name: Instalar dependências com Poetry
         run: poetry install --no-root --directory .
 
@@ -40,4 +43,3 @@ jobs:
 
       - name: Verificar Lint
         run: poetry run pylint jogo.py
-
