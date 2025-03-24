@@ -47,6 +47,9 @@ jobs:
             exit 0
           fi
 
+      - name: Corrigir fim de arquivo automaticamente
+        run: sed -i -e '$a\' jogo.py
+
       - name: Verificar PEP8
         run: poetry run flake8 jogo.py
 
