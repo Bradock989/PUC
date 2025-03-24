@@ -4,28 +4,51 @@ on:
   push:
     branches:
       - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout do Código
         uses: actions/checkout@v3
+
+      - name: Configurar a versão do Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'
+
       - name: Instalar o Poetry
         run: |
-            curl -sSL https://install.python-poetry.org | python3 -
-            echo "$HOME/.local/bin" >> $GITHUB_PATH
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.local/bin:$PATH"
+
       - name: Configurar cache do Poetry
         uses: actions/cache@v3
         with:
           path: |
+            ~/.local/share/pypoetry
             ~/.cache/pypoetry
             ~/.cache/pip
           key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
             poetry-${{ runner.os }}-
+
+      - name: Forçar uso do Python 3.13 no Poetry
+        run: poetry env use 3.13
+
       - name: Instalar dependências
         run: poetry install --no-root
+
+      - name: Verificar se jogo.py existe
+        run: |
+          if [ ! -f jogo.py ]; then
+            echo "Arquivo jogo.py não encontrado. Pulando lint..."
+            exit 0
+          fi
+
       - name: Verificar PEP8
         run: poetry run flake8 jogo.py
+
       - name: Verificar Lint
         run: poetry run pylint jogo.py
