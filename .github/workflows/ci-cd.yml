@@ -15,43 +15,29 @@ jobs:
       - name: Configurar a versão do Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.13'
+          python-version: '3.11'  # Versão estável recomendada
 
       - name: Instalar o Poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
           export PATH="$HOME/.local/bin:$PATH"
 
       - name: Configurar cache do Poetry
         uses: actions/cache@v3
         with:
           path: |
-            ~/.local/share/pypoetry
             ~/.cache/pypoetry
             ~/.cache/pip
+            ~/.local/share/pypoetry
           key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
             poetry-${{ runner.os }}-
 
-      - name: Forçar uso do Python 3.13 no Poetry
-        run: poetry env use 3.13
-
       - name: Instalar dependências
         run: poetry install --no-root
 
-      - name: Verificar se jogo.py existe
-        run: |
-          if [ ! -f jogo.py ]; then
-            echo "Arquivo jogo.py não encontrado. Pulando lint..."
-            exit 0
-          fi
-
-      - name: Corrigir fim de arquivo automaticamente
-        run: sed -i -e '$a\' jogo.py
-
       - name: Verificar PEP8
-        run: poetry run flake8 jogo.py
+        run: poetry run flake8 .
 
       - name: Verificar Lint
-        run: poetry run pylint jogo.py
+        run: poetry run pylint $(find . -name "*.py")
